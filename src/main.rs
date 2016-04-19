@@ -14,20 +14,20 @@ fn main() {
         is_exit: false,
         window_bounds: Bound {
             min: Point { x: 0, y: 0 },
-            max: Point { x: 79, y: 49 }
-        }
+            max: Point { x: 79, y: 49 },
+        },
     };
 
     let width = game.window_bounds.max.x + 1;
     let height = game.window_bounds.max.y + 1;
     let mut root = Root::initializer()
-        .font("arial10x10.png", FontLayout::Tcod)
-        .font_type(FontType::Greyscale)
-        .size(width, height)
-        .title("Rust/libtcod tutorial")
-        .init();
+                       .font("arial10x10.png", FontLayout::Tcod)
+                       .font_type(FontType::Greyscale)
+                       .size(width, height)
+                       .title("Rust/libtcod tutorial")
+                       .init();
 
-    let ch  = Box::new(Character::new(40, 20, '@'));
+    let ch = Box::new(Character::new(40, 20, '@'));
     let dog = Box::new(NPC::new(10, 10, 'd'));
     let mut renderables: Vec<Box<Renderable>> = vec![ch, dog];
 
