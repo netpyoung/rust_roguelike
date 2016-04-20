@@ -3,7 +3,14 @@ extern crate tcod;
 use self::tcod::input::{Key};
 use util::{Bound, Point};
 use actor::{Actor};
-use render::{TcodRenderingComponent, RenderingComponentAble, WindowComponent, TcodStatsWindowComponent, TcodMapWindowComponent};
+use render::{
+    TcodRenderingComponent,
+    RenderingComponentAble,
+    WindowComponent,
+    TcodStatsWindowComponent,
+    TcodInputWindowComponent,
+    TcodMapWindowComponent,
+};
 
 
 static mut LAST_KEYPRESS: Option<Key> = None;
@@ -14,6 +21,7 @@ pub struct Game <'a>{
     pub window_bounds: Bound,
     pub renderer: Box<RenderingComponentAble + 'a>,
     pub stats_window: Box<WindowComponent>,
+    pub input_window: Box<WindowComponent>,
     pub map_window: Box<WindowComponent>,
 }
 
@@ -22,15 +30,18 @@ impl<'a> Game <'a>{
         let total_bound = Bound::new(0, 0, 99, 61);
         let stats_bound = Bound::new(79, 0, 99, 49);
         let map_bound = Bound::new(0, 0, 78, 49);
+        let input_bound = Bound::new(0, 50, 99, 52);
         let renderer = Box::new(TcodRenderingComponent::new(total_bound));
-        let mut sw: Box<TcodStatsWindowComponent> = Box::new(WindowComponent::new(stats_bound));
-        let mut maw: Box<TcodMapWindowComponent> = Box::new(WindowComponent::new(map_bound));
+        let sw: Box<TcodStatsWindowComponent> = Box::new(WindowComponent::new(stats_bound));
+        let iw: Box<TcodInputWindowComponent> = Box::new(WindowComponent::new(input_bound));
+        let maw: Box<TcodMapWindowComponent> = Box::new(WindowComponent::new(map_bound));
 
         return Game {
             is_exit: false,
             window_bounds: total_bound,
             renderer: renderer,
             stats_window: sw,
+            input_window: iw,
             map_window: maw,
         }
     }
@@ -40,6 +51,7 @@ impl<'a> Game <'a>{
 
         self.renderer.attach_window(&mut self.stats_window);
         self.renderer.attach_window(&mut self.map_window);
+        self.renderer.attach_window(&mut self.input_window);
         for i in npcs.iter() {
             i.render(&mut *self.renderer);
         }
