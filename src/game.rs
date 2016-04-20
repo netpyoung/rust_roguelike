@@ -3,7 +3,7 @@ extern crate tcod;
 use self::tcod::input::{Key};
 use util::{Bound, Point};
 use actor::{Actor};
-use render::{RenderingComponent, RenderingComponentAble};
+use render::{TcodRenderingComponent, RenderingComponentAble, WindowComponent, TcodStatsWindowComponent, TcodMapWindowComponent};
 
 
 static mut LAST_KEYPRESS: Option<Key> = None;
@@ -13,25 +13,33 @@ pub struct Game <'a>{
     pub is_exit: bool,
     pub window_bounds: Bound,
     pub renderer: Box<RenderingComponentAble + 'a>,
+    pub stats_window: Box<WindowComponent>,
+    pub map_window: Box<WindowComponent>,
 }
 
 impl<'a> Game <'a>{
-    pub fn new(width: i32, height: i32) -> Game <'a>{
-        let bound = Bound {
-            min: Point { x: 0, y: 0 },
-            max: Point { x: width - 1, y: height - 1 },
-        };
-        let renderer = Box::new(RenderingComponent::new(bound));
+    pub fn new() -> Game <'a>{
+        let total_bound = Bound::new(0, 0, 99, 61);
+        let stats_bound = Bound::new(79, 0, 99, 49);
+        let map_bound = Bound::new(0, 0, 78, 49);
+        let renderer = Box::new(TcodRenderingComponent::new(total_bound));
+        let mut sw: Box<TcodStatsWindowComponent> = Box::new(WindowComponent::new(stats_bound));
+        let mut maw: Box<TcodMapWindowComponent> = Box::new(WindowComponent::new(map_bound));
 
         return Game {
             is_exit: false,
-            window_bounds: bound,
-            renderer: renderer
+            window_bounds: total_bound,
+            renderer: renderer,
+            stats_window: sw,
+            map_window: maw,
         }
     }
 
     pub fn render(&mut self, c: &Actor, npcs: &Vec<Box<Actor>>) {
         self.renderer.before_render_new_frame();
+
+        self.renderer.attach_window(&mut self.stats_window);
+        self.renderer.attach_window(&mut self.map_window);
         for i in npcs.iter() {
             i.render(&mut *self.renderer);
         }
