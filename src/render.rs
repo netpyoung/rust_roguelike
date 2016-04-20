@@ -19,7 +19,7 @@ pub trait RenderingComponentAble {
 }
 
 impl RenderingComponent {
-    pub fn new(bound: &Bound) ->  Self {
+    pub fn new(bound: Bound) ->  Self {
         let w = bound.max.x + 1;
         let h = bound.max.y + 1;
         let root = Root::initializer()

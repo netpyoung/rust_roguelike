@@ -3,7 +3,8 @@ extern crate tcod;
 
 use dwemthys::game::Game;
 use dwemthys::render::{RenderingComponentAble};
-use dwemthys::character::{Character, NPC, Renderable};
+use dwemthys::character::{Actor};
+use dwemthys::movement::{MovementComponent};
 
 use tcod::input::{KeyCode};
 
@@ -14,10 +15,11 @@ fn main() {
 
     let mut game = Game::new(width, height);
 
-    let mut ch = Character::new(40, 24, '@');
-    let mut dog = NPC::new(10, 10, 'd');
-    let mut cat = NPC::new(40, 25, 'c');
-    let mut renderables: Vec<&mut Renderable> = vec![&mut dog, &mut cat];
+    let mut ch = Actor::heroine(40, 24, game.window_bounds);
+    let mut renderables: Vec<Box<Actor>> = vec![
+        Box::new(Actor::dog(10, 10, game.window_bounds)),
+        Box::new(Actor::cat(40, 25, game.window_bounds)),
+    ];
 
 
     game.render(&ch, &renderables);
@@ -28,7 +30,7 @@ fn main() {
             KeyCode::Escape => game.is_exit = true,
             _ => {}
         }
-        game.update(&mut ch, &mut renderables, key);
+        game.update(&mut ch, &mut renderables);
         game.render(&ch, &renderables);
     }
 }
