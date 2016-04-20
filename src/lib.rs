@@ -1,5 +1,5 @@
 pub mod util;
-pub mod character;
-pub mod game;
 pub mod render;
+pub mod game;
+pub mod actor;
 pub mod movement;

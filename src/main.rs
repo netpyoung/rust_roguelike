@@ -3,24 +3,21 @@ extern crate tcod;
 
 use dwemthys::game::Game;
 use dwemthys::render::{RenderingComponentAble};
-use dwemthys::character::{Actor};
+use dwemthys::actor::{Actor};
 use dwemthys::movement::{MovementComponent};
 
 use tcod::input::{KeyCode};
 
 
 fn main() {
-    let width = 80;
-    let height = 50;
+    let mut game = Game::new(80, 50);
 
-    let mut game = Game::new(width, height);
-
-    let mut ch = Actor::heroine(40, 24, game.window_bounds);
+    let mut ch = Actor::heroine(game.window_bounds);
     let mut renderables: Vec<Box<Actor>> = vec![
         Box::new(Actor::dog(10, 10, game.window_bounds)),
         Box::new(Actor::cat(40, 25, game.window_bounds)),
+        Box::new(Actor::kobold(20, 20, game.window_bounds)),
     ];
-
 
     game.render(&ch, &renderables);
     while !(game.is_renderable() || game.is_exit) {

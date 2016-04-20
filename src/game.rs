@@ -2,11 +2,12 @@ extern crate tcod;
 
 use self::tcod::input::{Key};
 use util::{Bound, Point};
-use character::{Actor};
+use actor::{Actor};
 use render::{RenderingComponent, RenderingComponentAble};
 
 
 static mut LAST_KEYPRESS: Option<Key> = None;
+static mut CHAR_LOCATION: Point = Point{x: 40, y: 25};
 
 pub struct Game <'a>{
     pub is_exit: bool,
@@ -40,6 +41,7 @@ impl<'a> Game <'a>{
 
     pub fn update(&mut self, c: &mut Actor, npcs: &mut Vec<Box<Actor>>) {
         c.update();
+        Game::set_character_point(c.position);
         for i in npcs.iter_mut() {
             i.update();
         }
@@ -63,4 +65,11 @@ impl<'a> Game <'a>{
         unsafe { LAST_KEYPRESS = Some(key); }
     }
 
+    pub fn get_character_point() -> Point {
+        unsafe { CHAR_LOCATION }
+    }
+
+    pub fn set_character_point(p: Point) {
+        unsafe { CHAR_LOCATION = p }
+    }
 }

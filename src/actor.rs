@@ -3,13 +3,15 @@ extern crate tcod;
 
 use util::{Point, Bound};
 use render::{RenderingComponentAble};
+use game::Game;
 use movement::MovementComponent;
 use movement::MovementComponentRandom;
 use movement::MovementComponentUser;
+use movement::MovementComponentAggro;
 
 
 pub struct Actor {
-    position: Point,
+    pub position: Point,
     display_char: char,
     movement_component: Box<MovementComponent>,
 }
@@ -33,9 +35,15 @@ impl Actor {
         Actor::new(x, y, 'c', mc)
     }
 
-    pub fn heroine(x: i32, y: i32, bound: Bound) -> Actor {
+    pub fn kobold(x: i32, y: i32, bound: Bound) -> Actor {
+        let mc: Box<MovementComponentAggro> = Box::new(MovementComponent::new(bound));
+        Actor::new(x, y, 'k', mc)
+    }
+
+    pub fn heroine(bound: Bound) -> Actor {
         let mc: Box<MovementComponentUser> = Box::new(MovementComponent::new(bound));
-        Actor::new(x, y, '@', mc)
+        let p = Game::get_character_point();
+        Actor::new(p.x, p.y, '@', mc)
     }
 
     pub fn update(&mut self) {
