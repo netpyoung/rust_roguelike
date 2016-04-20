@@ -1,11 +1,12 @@
 extern crate rand;
 extern crate tcod;
 
+use self::rand::Rng;
+use self::tcod::input::{Key, KeyCode};
+
 use game::Game;
 use util::{Point, Contains};
 use render::{RenderingComponentAble};
-use self::rand::Rng;
-use self::tcod::input::{Key, KeyCode};
 
 
 
