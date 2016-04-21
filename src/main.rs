@@ -14,7 +14,7 @@ use tcod::input::{KeyCode};
 fn main() {
     let mut game = Game::new();
 
-    let map_bounds = game.map_window.get_bounds();
+    let map_bounds = game.windows.map.get_bounds();
     let mut ch = Actor::heroine(map_bounds);
     let mut renderables: Vec<Box<Actor>> = vec![
         Box::new(Actor::dog(10, 10, map_bounds)),

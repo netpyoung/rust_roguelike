@@ -127,3 +127,22 @@ impl WindowComponent for TcodMessageWindowComponent {
     window_component_init!(TcodMessageWindowComponent, Color::new(255, 255, 255), 10);
     window_component_getters!();
 }
+
+
+pub struct Windows {
+    pub stats:    Box<WindowComponent>,
+    pub map:      Box<WindowComponent>,
+    pub input:    Box<WindowComponent>,
+    pub messages: Box<WindowComponent>,
+}
+
+impl Windows {
+    pub fn all_windows(&mut self) -> Vec<&mut Box<WindowComponent>> {
+        vec![
+            &mut self.stats,
+            &mut self.input,
+            &mut self.messages,
+            &mut self.map,
+        ]
+    }
+}

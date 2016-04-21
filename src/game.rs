@@ -10,6 +10,7 @@ use rendering::render::{
     RenderingComponentAble,
 };
 use rendering::window::{
+    Windows,
     WindowComponent,
     TcodStatsWindowComponent,
     TcodInputWindowComponent,
@@ -23,14 +24,11 @@ use rendering::window::{
 static mut LAST_KEYPRESS: Option<Key> = None;
 static mut CHAR_LOCATION: Point = Point{x: 40, y: 25};
 
-pub struct Game <'a>{
+pub struct Game <'a> {
     pub is_exit: bool,
     pub window_bounds: Bound,
     pub renderer: Box<RenderingComponentAble + 'a>,
-    pub stats_window: Box<WindowComponent>,
-    pub input_window: Box<WindowComponent>,
-    pub map_window: Box<WindowComponent>,
-    pub message_window: Box<WindowComponent>,
+    pub windows: Windows,
     pub game_state: Box<GameState>,
 }
 
@@ -47,28 +45,25 @@ impl<'a> Game <'a> {
         let iw: Box<TcodInputWindowComponent> = Box::new(WindowComponent::new(input_bound));
         let mw: Box<TcodMessageWindowComponent> = Box::new(WindowComponent::new(message_bound));
         let maw: Box<TcodMapWindowComponent> = Box::new(WindowComponent::new(map_bound));
+        let windows = Windows {
+            stats: sw,
+            input: iw,
+            map: maw,
+            messages: mw,
+        };
 
         let gs: Box<GameState>  = Box::new(MovementGameState::new());
         return Game {
             is_exit: false,
             window_bounds: total_bound,
             renderer: renderer,
-            stats_window: sw,
-            input_window: iw,
-            map_window: maw,
-            message_window: mw,
+            windows: windows,
             game_state: gs,
         }
     }
 
     pub fn render(&mut self, c: &Actor, npcs: &Vec<Box<Actor>>) {
-        let mut windows = vec![
-            &mut self.stats_window,
-            &mut self.map_window,
-            &mut self.input_window,
-            &mut self.message_window,
-        ];
-        self.game_state.render(&mut *self.renderer, npcs, c, &mut windows);
+        self.game_state.render(&mut *self.renderer, npcs, c, &mut self.windows);
     }
 
     pub fn update(&mut self, c: &mut Actor, npcs: &mut Vec<Box<Actor>>) {
@@ -82,8 +77,8 @@ impl<'a> Game <'a> {
     pub fn wait_for_keypress(&mut self) -> Key {
         let key = self.renderer.wait_for_keypress();
         match key.printable {
-            '/' => self.input_window.buffer_message("Wich direction would you like to attack with your heoric sword? [Press an arrow key]"),
-            _  => self.input_window.flush_buffer()
+            '/' => self.windows.input.buffer_message("Wich direction would you like to attack with your heoric sword? [Press an arrow key]"),
+            _  => self.windows.input.flush_buffer()
         }
 
 
