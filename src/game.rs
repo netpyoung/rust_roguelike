@@ -3,6 +3,8 @@ extern crate tcod;
 use self::tcod::input::{Key};
 use util::{Bound, Point};
 use actor::{Actor};
+use game_state::GameState;
+use game_state::MovementGameState;
 use rendering::render::{
     TcodRenderingComponent,
     RenderingComponentAble,
@@ -12,6 +14,7 @@ use rendering::window::{
     TcodStatsWindowComponent,
     TcodInputWindowComponent,
     TcodMapWindowComponent,
+    TcodMessageWindowComponent,
 };
 
 
@@ -27,19 +30,25 @@ pub struct Game <'a>{
     pub stats_window: Box<WindowComponent>,
     pub input_window: Box<WindowComponent>,
     pub map_window: Box<WindowComponent>,
+    pub message_window: Box<WindowComponent>,
+    pub game_state: Box<GameState>,
 }
 
-impl<'a> Game <'a>{
+impl<'a> Game <'a> {
     pub fn new() -> Game <'a>{
         let total_bound = Bound::new(0, 0, 99, 61);
         let stats_bound = Bound::new(79, 0, 99, 49);
         let map_bound = Bound::new(0, 0, 78, 49);
         let input_bound = Bound::new(0, 50, 99, 52);
+        let message_bound = Bound::new(0, 52, 99, 61);
+
         let renderer = Box::new(TcodRenderingComponent::new(total_bound));
         let sw: Box<TcodStatsWindowComponent> = Box::new(WindowComponent::new(stats_bound));
         let iw: Box<TcodInputWindowComponent> = Box::new(WindowComponent::new(input_bound));
+        let mw: Box<TcodMessageWindowComponent> = Box::new(WindowComponent::new(message_bound));
         let maw: Box<TcodMapWindowComponent> = Box::new(WindowComponent::new(map_bound));
 
+        let gs: Box<GameState>  = Box::new(MovementGameState::new());
         return Game {
             is_exit: false,
             window_bounds: total_bound,
@@ -47,20 +56,19 @@ impl<'a> Game <'a>{
             stats_window: sw,
             input_window: iw,
             map_window: maw,
+            message_window: mw,
+            game_state: gs,
         }
     }
 
     pub fn render(&mut self, c: &Actor, npcs: &Vec<Box<Actor>>) {
-        self.renderer.before_render_new_frame();
-
-        self.renderer.attach_window(&mut self.stats_window);
-        self.renderer.attach_window(&mut self.map_window);
-        self.renderer.attach_window(&mut self.input_window);
-        for i in npcs.iter() {
-            i.render(&mut *self.renderer);
-        }
-        c.render(&mut *self.renderer);
-        self.renderer.after_render_new_frame();
+        let mut windows = vec![
+            &mut self.stats_window,
+            &mut self.map_window,
+            &mut self.input_window,
+            &mut self.message_window,
+        ];
+        self.game_state.render(&mut *self.renderer, npcs, c, &mut windows);
     }
 
     pub fn update(&mut self, c: &mut Actor, npcs: &mut Vec<Box<Actor>>) {
