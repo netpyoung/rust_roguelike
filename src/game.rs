@@ -69,6 +69,12 @@ impl<'a> Game <'a>{
 
     pub fn wait_for_keypress(&mut self) -> Key {
         let key = self.renderer.wait_for_keypress();
+        match key.printable {
+            '/' => self.input_window.buffer_message("Wich direction would you like to attack with your heoric sword? [Press an arrow key]"),
+            _  => self.input_window.flush_buffer()
+        }
+
+
         Game::set_last_keypress(key);
         key
     }

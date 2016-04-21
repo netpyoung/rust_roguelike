@@ -61,9 +61,17 @@ impl RenderingComponentAble for TcodRenderingComponent {
     fn attach_window(&mut self, window: &mut Box<WindowComponent>) {
         window.clear();
         let bound = window.get_bounds();
-        let console = window.get_console();
         let messages = window.get_messages();
-        tcod::console::blit(&console, (0, 0), ((bound.max.x + 1), (bound.max.y + 1)), &mut self.root, (bound.min.x, bound.min.y), 1.0, 1.0);
+
+        for (i, message) in messages.iter().enumerate() {
+            window.print_message(0, i as i32, tcod::TextAlignment::Left, message);
+        }
+
+        {
+            let console = window.get_console();
+
+            tcod::console::blit(&console, (0, 0), ((bound.max.x + 1), (bound.max.y + 1)), &mut self.root, (bound.min.x, bound.min.y), 1.0, 1.0);
+        }
     }
 }
 
@@ -87,7 +95,7 @@ pub trait WindowComponent {
     }
 
     fn get_mut_messages(&mut self) -> &mut Vec<String>;
-    fn get_messages(&self) -> &Vec<String>;
+    fn get_messages(&self) -> Vec<String>;
     fn get_max_messages(&self) -> usize;
 
     fn buffer_message(&mut self, text: &str) {
@@ -95,6 +103,16 @@ pub trait WindowComponent {
         let message = String::from(text);
         let messages = self.get_mut_messages();
         messages.insert(0, message);
+        messages.truncate(max);
+    }
+
+    fn flush_buffer(&mut self) {
+        let max      = self.get_max_messages();
+        let messages = self.get_mut_messages();
+
+        for _ in 0..max {
+            messages.insert(0, String::from(""));
+        }
         messages.truncate(max);
     }
 }
@@ -141,8 +159,8 @@ impl WindowComponent for TcodStatsWindowComponent {
         &mut self.messages
     }
 
-    fn get_messages(&self) -> &Vec<String> {
-        &self.messages
+    fn get_messages(&self) -> Vec<String> {
+        self.messages.clone()
     }
 
     fn get_max_messages(&self) -> usize{
@@ -167,7 +185,7 @@ impl WindowComponent for TcodInputWindowComponent {
         let color = Color::new(255, 0, 255);
         let console: Box<Console> = Box::new(Offscreen::new(w, h));
         let messages: Vec<String> = vec![];
-        let max_messages = 32;
+        let max_messages = 1;
 
         TcodInputWindowComponent {
             console: console,
@@ -191,8 +209,8 @@ impl WindowComponent for TcodInputWindowComponent {
         &mut self.messages
     }
 
-    fn get_messages(&self) -> &Vec<String> {
-        &self.messages
+    fn get_messages(&self) -> Vec<String> {
+        self.messages.clone()
     }
 
     fn get_max_messages(&self) -> usize{
@@ -245,8 +263,8 @@ impl WindowComponent for TcodMapWindowComponent {
         &mut self.messages
     }
 
-    fn get_messages(&self) -> &Vec<String> {
-        &self.messages
+    fn get_messages(&self) -> Vec<String> {
+        self.messages.clone()
     }
 
     fn get_max_messages(&self) -> usize{
