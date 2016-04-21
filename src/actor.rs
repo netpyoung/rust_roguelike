@@ -2,7 +2,7 @@ extern crate rand;
 extern crate tcod;
 
 use util::{Point, Bound};
-use render::{RenderingComponentAble};
+use rendering::render::{RenderingComponentAble};
 use game::Game;
 use movement::MovementComponent;
 use movement::MovementComponentRandom;

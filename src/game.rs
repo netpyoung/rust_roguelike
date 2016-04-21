@@ -3,14 +3,18 @@ extern crate tcod;
 use self::tcod::input::{Key};
 use util::{Bound, Point};
 use actor::{Actor};
-use render::{
+use rendering::render::{
     TcodRenderingComponent,
     RenderingComponentAble,
+};
+use rendering::window::{
     WindowComponent,
     TcodStatsWindowComponent,
     TcodInputWindowComponent,
     TcodMapWindowComponent,
 };
+
+
 
 
 static mut LAST_KEYPRESS: Option<Key> = None;
