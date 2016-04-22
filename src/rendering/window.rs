@@ -118,13 +118,13 @@ impl WindowComponent for TcodInputWindowComponent {
 
 window_component_def!(TcodMapWindowComponent);
 impl WindowComponent for TcodMapWindowComponent {
-    window_component_init!(TcodMapWindowComponent, Color::new(255, 255, 255), 10);
+    window_component_init!(TcodMapWindowComponent, Color::new(200, 0, 0), 10);
     window_component_getters!();
 }
 
 window_component_def!(TcodMessageWindowComponent);
 impl WindowComponent for TcodMessageWindowComponent {
-    window_component_init!(TcodMessageWindowComponent, Color::new(255, 255, 255), 10);
+    window_component_init!(TcodMessageWindowComponent, Color::new(0, 0, 0), 10);
     window_component_getters!();
 }
 
