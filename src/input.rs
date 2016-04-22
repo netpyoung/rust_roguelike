@@ -2,6 +2,7 @@ extern crate tcod;
 
 pub type TcodInputKey = self::tcod::input::Key;
 
+#[derive(Debug, Copy, Clone)]
 pub enum KeyCode {
     // Arrow keys
     Up,
@@ -17,14 +18,17 @@ pub enum KeyCode {
     None
 }
 
+
+#[derive(Debug, Copy, Clone)]
 pub enum Key {
     Printable(char),
     SpecialKey(KeyCode)
 }
 
 
+#[derive(Debug, Copy, Clone)]
 pub struct KeyboardInput {
-    key: Key
+    pub key: Key
 }
 
 
@@ -47,6 +51,7 @@ impl InputComponent<TcodInputKey> for TcodInputComponent {
             match key_state.code {
                 self::tcod::input::KeyCode::Number5 => Key::Printable('%'),
                 self::tcod::input::KeyCode::Number6 => Key::Printable('^'),
+                self::tcod::input::KeyCode::Number7 => Key::Printable('&'),
                 self::tcod::input::KeyCode::Number8 => Key::Printable('*'),
                 _                                   => Key::SpecialKey(KeyCode::None)
             }

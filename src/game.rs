@@ -1,6 +1,6 @@
 extern crate tcod;
 
-use self::tcod::input::{Key, KeyCode};
+use input::{Key, KeyboardInput};
 use util::{Bound, Point};
 use actor::{Actor};
 use game_state::GameState;
@@ -22,9 +22,7 @@ use rendering::window::{
 };
 
 
-
-
-static mut LAST_KEYPRESS: Option<Key> = None;
+static mut LAST_KEYPRESS: Option<KeyboardInput> = None;
 static mut CHAR_LOCATION: Point = Point{x: 40, y: 25};
 
 pub struct Game <'a> {
@@ -79,7 +77,7 @@ impl<'a> Game <'a> {
         self.game_state.update(npcs, c, &mut self.windows);
     }
 
-    pub fn wait_for_keypress(&mut self) -> Key {
+    pub fn wait_for_keypress(&mut self) -> KeyboardInput {
         let key = self.renderer.wait_for_keypress();
         Game::set_last_keypress(key);
         key
@@ -89,12 +87,12 @@ impl<'a> Game <'a> {
         self.renderer.is_renderable()
     }
 
-    pub fn get_last_keypress() -> Option<Key> {
+    pub fn get_last_keypress() -> Option<KeyboardInput> {
         unsafe { LAST_KEYPRESS }
     }
 
-    pub fn set_last_keypress(key: Key) {
-        unsafe { LAST_KEYPRESS = Some(key); }
+    pub fn set_last_keypress(keyboard_input: KeyboardInput) {
+        unsafe { LAST_KEYPRESS = Some(keyboard_input); }
     }
 
     pub fn get_character_point() -> Point {
@@ -106,48 +104,33 @@ impl<'a> Game <'a> {
     }
 
     fn update_state(&mut self) {
-        match Game::get_last_keypress() {
-            Some(key) => {
-                match key.code {
-                    KeyCode::Char => {
-                        match key.printable {
-                            '/' => {
-                                let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
-                                is.weapon = "Heroic Sword".to_string();
-                                self.game_state = is as Box<GameState>;
-                            },
-                            _ => {},
-                        }
-                    },
-                    KeyCode::Number6 => {
-                        if key.shift {
-                            let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
-                            is.weapon = "Boomerang".to_string();
-                            self.game_state = is as Box<GameState>;
-                        }
-                    },
-                    KeyCode::Number8 => {
-                        if key.shift {
-                            let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
-                            is.weapon = "Deadly Bomb".to_string();
-                            self.game_state = is as Box<GameState>;
-                        }
-                    },
-                    KeyCode::Number5 => {
-                        if key.shift {
-                            let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
-                            is.weapon = "Delicious Lettuce".to_string();
-                            self.game_state = is as Box<GameState>;
-                        }
-                    },
-                    KeyCode::Shift => {}
-                    _ => {
-                        let ms : Box<MovementGameState> = Box::new(GameState::new());
-                        self.game_state = ms as Box<GameState>;
-                    }
-                }
+        let keyboard_input = Game::get_last_keypress().unwrap();
+        match keyboard_input.key {
+
+            Key::Printable('/') => {
+                let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
+                is.weapon = "Heroic Sword".to_string();
+                self.game_state = is as Box<GameState>;
             },
-            _ => {}
+            Key::Printable('^') => {
+                let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
+                is.weapon = "Boomerang".to_string();
+                self.game_state = is as Box<GameState>;
+            },
+            Key::Printable('&') => {
+                let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
+                is.weapon = "Deadly Bomb".to_string();
+                self.game_state = is as Box<GameState>;
+            },
+            Key::Printable('%') => {
+                let mut is : Box<AttackInputGameState> = Box::new(GameState::new());
+                is.weapon = "Delicious Lettuce".to_string();
+                self.game_state = is as Box<GameState>;
+            },
+            _ => {
+                let ms : Box<MovementGameState> = Box::new(GameState::new());
+                self.game_state = ms as Box<GameState>;
+            }
         }
     }
 }

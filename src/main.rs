@@ -6,9 +6,7 @@ use dwemthys::rendering::render::{RenderingComponentAble};
 use dwemthys::rendering::window::WindowComponent;
 use dwemthys::actor::{Actor};
 use dwemthys::movement::{MovementComponent};
-
-
-use tcod::input::{KeyCode};
+use dwemthys::input::{Key, KeyCode};
 
 
 fn main() {
@@ -25,9 +23,9 @@ fn main() {
     game.render(&ch, &renderables);
     while !(game.is_renderable() || game.is_exit) {
 
-        let key = game.wait_for_keypress();
-        match key.code {
-            KeyCode::Escape => game.is_exit = true,
+        let keyboard_input = game.wait_for_keypress();
+        match keyboard_input.key {
+            Key::SpecialKey(KeyCode::Escape) => game.is_exit = true,
             _ => {}
         }
         game.update(&mut ch, &mut renderables);

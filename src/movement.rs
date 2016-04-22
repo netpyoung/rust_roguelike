@@ -2,7 +2,7 @@ extern crate rand;
 extern crate tcod;
 
 use self::rand::Rng;
-use self::tcod::input::KeyCode;
+use input::{Key, KeyCode};
 use util::{Point, Bound, Contains, PointRelationX, PointRelationY, PointEquality};
 use game::Game;
 
@@ -48,14 +48,19 @@ impl MovementComponent for MovementComponentUser {
     }
 
     fn update(&self, point: Point) -> Point {
-        let key = Game::get_last_keypress().unwrap();
+        let keyboard_input = Game::get_last_keypress().unwrap();
         let mut offset = Point { x: point.x, y: point.y };
 
-        offset = match key.code {
-            KeyCode::Up => offset.offset_y(-1),
-            KeyCode::Down => offset.offset_y(1),
-            KeyCode::Left => offset.offset_x(-1),
-            KeyCode::Right => offset.offset_x(1),
+        offset = match keyboard_input.key {
+            Key::SpecialKey(special) => {
+                match special {
+                    KeyCode::Up => offset.offset_y(-1),
+                    KeyCode::Down => offset.offset_y(1),
+                    KeyCode::Left => offset.offset_x(-1),
+                    KeyCode::Right => offset.offset_x(1),
+                    _ => offset
+                }
+            },
             _ => offset
         };
 

@@ -2,7 +2,7 @@ extern crate tcod;
 
 
 use self::tcod::console::{Root, Console, BackgroundFlag, FontLayout, FontType};
-use self::tcod::input::{Key};
+use input::{TcodInputKey, InputComponent, TcodInputComponent, KeyboardInput};
 use util::{Point, Bound};
 use rendering::window::{
     WindowComponent,
@@ -10,13 +10,14 @@ use rendering::window::{
 
 pub struct TcodRenderingComponent {
     pub root: Root,
+    pub input_component: Box<InputComponent<TcodInputKey>>
 }
 
 pub trait RenderingComponentAble {
     fn before_render_new_frame(&mut self);
     fn render_object(&mut self, Point, char);
     fn after_render_new_frame(&mut self);
-    fn wait_for_keypress(&mut self) -> Key;
+    fn wait_for_keypress(&mut self) -> KeyboardInput;
     fn is_renderable(&mut self) -> bool;
 
     fn attach_window(&mut self, &mut Box<WindowComponent>);
@@ -33,7 +34,11 @@ impl TcodRenderingComponent {
             .size(w, h)
             .title("Rust/libtcod tutorial")
             .init();
-        TcodRenderingComponent{root: root}
+        let ic  = Box::new(TcodInputComponent::new());
+        TcodRenderingComponent{
+            root: root,
+            input_component: ic,
+        }
     }
 }
 
@@ -51,8 +56,8 @@ impl RenderingComponentAble for TcodRenderingComponent {
         self.root.flush();
     }
 
-    fn wait_for_keypress(&mut self) -> Key {
-        self.root.wait_for_keypress(true)
+    fn wait_for_keypress(&mut self) -> KeyboardInput {
+        self.input_component.translate_input(self.root.wait_for_keypress(true))
     }
 
     fn is_renderable(&mut self) -> bool {

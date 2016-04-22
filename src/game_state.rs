@@ -1,6 +1,6 @@
 extern crate tcod;
 
-use self::tcod::input::{KeyCode};
+use input::{Key, KeyCode};
 
 use actor::Actor;
 use rendering::render::RenderingComponentAble;
@@ -87,25 +87,30 @@ impl GameState for AttackInputGameState {
     fn update(&mut self,  _: &mut Vec<Box<Actor>>, _: &mut Actor, windows: &mut Windows) {
 
         match Game::get_last_keypress() {
-            Some(key) => {
+            Some(keyboard_input) => {
                 let mut msg = "You attack ".to_string();
 
-                match key.code {
-                    KeyCode::Up => {
-                        msg.push_str("up");
-                        self.should_update_state = true;
-                    },
-                    KeyCode::Down => {
-                        msg.push_str("down");
-                        self.should_update_state = true;
-                    },
-                    KeyCode::Left => {
-                        msg.push_str("left");
-                        self.should_update_state = true;
-                    },
-                    KeyCode::Right => {
-                        msg.push_str("right");
-                        self.should_update_state = true;
+                match keyboard_input.key {
+                    Key::SpecialKey(special) => {
+                        match special {
+                            KeyCode::Up => {
+                                msg.push_str("up");
+                                self.should_update_state = true;
+                            },
+                            KeyCode::Down => {
+                                msg.push_str("down");
+                                self.should_update_state = true;
+                            },
+                            KeyCode::Left => {
+                                msg.push_str("left");
+                                self.should_update_state = true;
+                            },
+                            KeyCode::Right => {
+                                msg.push_str("right");
+                                self.should_update_state = true;
+                            },
+                            _ => {}
+                        }
                     },
                     _ => {}
                 }
