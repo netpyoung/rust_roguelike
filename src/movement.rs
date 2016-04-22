@@ -9,6 +9,7 @@ use game::Game;
 pub trait MovementComponent {
     fn new(Bound) -> Self where Self: Sized;
     fn update(&self, Point) -> Point;
+    fn box_clone(&self) -> Box<MovementComponent>;
 }
 
 pub struct MovementComponentRandom {
@@ -35,6 +36,10 @@ impl MovementComponent for MovementComponentRandom {
             Contains::DoesContain => offset = offset.offset_y(offset_y)
         }
         offset
+    }
+
+    fn box_clone(&self) -> Box<MovementComponent> {
+        Box::new(MovementComponentRandom{window_bound: self.window_bound})
     }
 }
 
@@ -68,6 +73,10 @@ impl MovementComponent for MovementComponentUser {
             Contains::DoesContain => offset,
             Contains::DoesNotContain => point
         }
+    }
+
+    fn box_clone(&self) -> Box<MovementComponent> {
+        Box::new(MovementComponentUser{window_bound: self.window_bound})
     }
 }
 
@@ -103,5 +112,9 @@ impl MovementComponent for MovementComponentAggro {
                 }
             }
         }
+    }
+
+    fn box_clone(&self) -> Box<MovementComponent> {
+        Box::new(MovementComponentAggro{window_bound: self.window_bound})
     }
 }

@@ -2,26 +2,22 @@ extern crate tcod;
 
 use input::{Key, KeyCode};
 
-use actor::Actor;
 use rendering::render::RenderingComponentAble;
 use rendering::window::Windows;
 use rendering::window::WindowComponent;
 use game::Game;
-
+use map::Maps;
 
 pub trait GameState {
     fn new() -> Self where Self: Sized;
 
-    fn update(&mut self, npcs: &mut Vec<Box<Actor>>, character: &mut Actor, windows: &mut Windows);
-    fn render(&mut self, renderer: &mut RenderingComponentAble, npcs: &Vec<Box<Actor>>, character: &Actor, windows: &mut Windows) {
+    fn update(&mut self, windows: &mut Windows, maps: &mut Maps);
+    fn render(&mut self, renderer: &mut RenderingComponentAble, windows: &mut Windows, maps: &mut Maps) {
         renderer.before_render_new_frame();
         for window in windows.all_windows() {
             renderer.attach_window(window);
         }
-        for npc in npcs {
-            npc.render(renderer);
-        }
-        character.render(renderer);
+        maps.render(renderer);
         renderer.after_render_new_frame();
     }
 
@@ -37,11 +33,18 @@ impl GameState for MovementGameState {
         MovementGameState
     }
 
-    fn update(&mut self, npcs: &mut Vec<Box<Actor>>, character: &mut Actor, _: &mut Windows) {
-        character.update();
-        Game::set_character_point(character.position);
-        for npc in npcs.iter_mut() {
-            npc.update();
+    fn update(&mut self, windows: &mut Windows, maps: &mut Maps) {
+        match Game::get_last_keypress() {
+            Some(ks) => {
+                match ks.key {
+                    Key::SpecialKey(KeyCode::Shift) => {
+                    },
+                    _ => {
+                        maps.update(windows);
+                    }
+                }
+            },
+            _    => {}
         }
     }
 
@@ -84,7 +87,7 @@ impl GameState for AttackInputGameState {
     fn exit(&self) {
     }
 
-    fn update(&mut self,  _: &mut Vec<Box<Actor>>, _: &mut Actor, windows: &mut Windows) {
+    fn update(&mut self,  windows: &mut Windows, _: &mut Maps) {
 
         match Game::get_last_keypress() {
             Some(keyboard_input) => {

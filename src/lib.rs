@@ -5,3 +5,4 @@ pub mod game_state;
 pub mod actor;
 pub mod movement;
 pub mod input;
+pub mod map;

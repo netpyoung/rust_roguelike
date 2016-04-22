@@ -2,7 +2,6 @@ extern crate tcod;
 
 use input::{Key, KeyboardInput};
 use util::{Bound, Point};
-use actor::{Actor};
 use game_state::GameState;
 use game_state::{
     MovementGameState,
@@ -20,6 +19,7 @@ use rendering::window::{
     TcodMapWindowComponent,
     TcodMessageWindowComponent,
 };
+use map::{Maps};
 
 
 static mut LAST_KEYPRESS: Option<KeyboardInput> = None;
@@ -31,6 +31,7 @@ pub struct Game <'a> {
     pub renderer: Box<RenderingComponentAble + 'a>,
     pub windows: Windows,
     pub game_state: Box<GameState>,
+    pub maps: Maps,
 }
 
 impl<'a> Game <'a> {
@@ -54,27 +55,30 @@ impl<'a> Game <'a> {
         };
 
         let gs: Box<GameState>  = Box::new(MovementGameState::new());
+        let maps = Maps::new(map_bound);
+
         return Game {
             is_exit: false,
             window_bounds: total_bound,
             renderer: renderer,
             windows: windows,
             game_state: gs,
+            maps: maps,
         }
     }
 
-    pub fn render(&mut self, c: &Actor, npcs: &Vec<Box<Actor>>) {
-        self.game_state.render(&mut *self.renderer, npcs, c, &mut self.windows);
+    pub fn render(&mut self) {
+        self.game_state.render(&mut *self.renderer, &mut self.windows, &mut self.maps);
     }
 
-    pub fn update(&mut self, c: &mut Actor, npcs: &mut Vec<Box<Actor>>) {
+    pub fn update(&mut self) {
         if self.game_state.should_update_state() {
             self.game_state.exit();
             self.update_state();
             self.game_state.enter(&mut self.windows);
         }
 
-        self.game_state.update(npcs, c, &mut self.windows);
+        self.game_state.update(&mut self.windows, &mut self.maps);
     }
 
     pub fn wait_for_keypress(&mut self) -> KeyboardInput {
