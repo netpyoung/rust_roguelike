@@ -4,8 +4,8 @@ extern crate tcod;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use util::{Point};
-use rendering::render::{RenderingComponentAble};
+use util::Point;
+use rendering::render::RenderingComponentAble;
 use rendering::window::Windows;
 use game::MoveInfo;
 use movement::MovementComponent;
@@ -64,6 +64,10 @@ impl Actor {
 impl Clone for Actor {
     fn clone(&self) -> Actor {
         let mc = self.movement_component.box_clone();
-        Actor::new(self.position.x, self.position.y, self.display_char, mc, self.is_pc)
+        Actor::new(self.position.x,
+                   self.position.y,
+                   self.display_char,
+                   mc,
+                   self.is_pc)
     }
 }

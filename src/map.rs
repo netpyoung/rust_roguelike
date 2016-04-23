@@ -19,27 +19,26 @@ pub struct Maps {
     pub terrain: Box<Map>,
     pub enemies: Box<Map>,
     pub friends: Box<Map>,
-    pub pcs:     Box<Map>,
+    pub pcs: Box<Map>,
 }
 
 impl Map {
-
     pub fn new(move_info: Rc<RefCell<MoveInfo>>) -> Map {
         let size = move_info.borrow().bounds;
         let content = Map::init_contents(size);
         Map {
             content: content,
-            size:size,
+            size: size,
             move_info: move_info,
         }
     }
 
     pub fn init_contents(size: Bound) -> Vec<Vec<Vec<Box<Actor>>>> {
-        let mut contents : Vec<Vec<Vec<Box<Actor>>>> = vec![];
+        let mut contents: Vec<Vec<Vec<Box<Actor>>>> = vec![];
         for _ in 0..size.max.x {
-            let mut x_vec : Vec<Vec<Box<Actor>>> = vec![];
+            let mut x_vec: Vec<Vec<Box<Actor>>> = vec![];
             for _ in 0..size.max.y {
-                let y_vec : Vec<Box<Actor>> = vec![];
+                let y_vec: Vec<Box<Actor>> = vec![];
                 x_vec.push(y_vec);
             }
             contents.push(x_vec);
@@ -86,13 +85,13 @@ impl Maps {
         let terrain = Box::new(Map::new(move_info.clone()));
         let enemies = Box::new(Map::new(move_info.clone()));
         let friends = Box::new(Map::new(move_info.clone()));
-        let pcs     = Box::new(Map::new(move_info.clone()));
+        let pcs = Box::new(Map::new(move_info.clone()));
 
         Maps {
             friends: friends,
             enemies: enemies,
             terrain: terrain,
-            pcs:     pcs,
+            pcs: pcs,
         }
     }
 

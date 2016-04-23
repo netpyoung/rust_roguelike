@@ -14,8 +14,14 @@ use map::Maps;
 pub trait GameState {
     fn new() -> Self where Self: Sized;
 
-    fn update(&mut self, windows: &mut Windows, maps: &mut Maps, move_info: &mut Rc<RefCell<MoveInfo>>);
-    fn render(&mut self, renderer: &mut RenderingComponentAble, windows: &mut Windows, maps: &mut Maps) {
+    fn update(&mut self,
+              windows: &mut Windows,
+              maps: &mut Maps,
+              move_info: &mut Rc<RefCell<MoveInfo>>);
+    fn render(&mut self,
+              renderer: &mut RenderingComponentAble,
+              windows: &mut Windows,
+              maps: &mut Maps) {
         renderer.before_render_new_frame();
         for window in windows.all_windows() {
             renderer.attach_window(window);
@@ -36,27 +42,27 @@ impl GameState for MovementGameState {
         MovementGameState
     }
 
-    fn update(&mut self, windows: &mut Windows, maps: &mut Maps, move_info: &mut Rc<RefCell<MoveInfo>>) {
+    fn update(&mut self,
+              windows: &mut Windows,
+              maps: &mut Maps,
+              move_info: &mut Rc<RefCell<MoveInfo>>) {
         let keypress = move_info.borrow().last_keypress;
         match keypress {
             Some(ks) => {
                 match ks.key {
-                    Key::SpecialKey(KeyCode::Shift) => {
-                    },
+                    Key::SpecialKey(KeyCode::Shift) => {}
                     _ => {
                         maps.update(windows);
                     }
                 }
-            },
-            _    => {}
+            }
+            _ => {}
         }
     }
 
-    fn enter(&self, _: &mut Windows) {
-    }
+    fn enter(&self, _: &mut Windows) {}
 
-    fn exit(&self) {
-    }
+    fn exit(&self) {}
 
     fn should_update_state(&self) -> bool {
         true
@@ -65,14 +71,14 @@ impl GameState for MovementGameState {
 
 pub struct AttackInputGameState {
     should_update_state: bool,
-    pub weapon: String
+    pub weapon: String,
 }
 
 impl GameState for AttackInputGameState {
     fn new() -> AttackInputGameState {
         AttackInputGameState {
             should_update_state: false,
-            weapon: "".to_string()
+            weapon: "".to_string(),
         }
     }
 
@@ -88,10 +94,12 @@ impl GameState for AttackInputGameState {
         windows.input.buffer_message(msg.as_str())
     }
 
-    fn exit(&self) {
-    }
+    fn exit(&self) {}
 
-    fn update(&mut self,  windows: &mut Windows, _: &mut Maps, move_info: &mut Rc<RefCell<MoveInfo>>) {
+    fn update(&mut self,
+              windows: &mut Windows,
+              _: &mut Maps,
+              move_info: &mut Rc<RefCell<MoveInfo>>) {
         let keypress = move_info.borrow().last_keypress;
 
         match keypress {
@@ -104,22 +112,22 @@ impl GameState for AttackInputGameState {
                             KeyCode::Up => {
                                 msg.push_str("up");
                                 self.should_update_state = true;
-                            },
+                            }
                             KeyCode::Down => {
                                 msg.push_str("down");
                                 self.should_update_state = true;
-                            },
+                            }
                             KeyCode::Left => {
                                 msg.push_str("left");
                                 self.should_update_state = true;
-                            },
+                            }
                             KeyCode::Right => {
                                 msg.push_str("right");
                                 self.should_update_state = true;
-                            },
+                            }
                             _ => {}
                         }
-                    },
+                    }
                     _ => {}
                 }
 
@@ -129,7 +137,7 @@ impl GameState for AttackInputGameState {
                     msg.push_str("!");
                     windows.messages.buffer_message(msg.as_str());
                 }
-            },
+            }
             _ => {}
         }
     }

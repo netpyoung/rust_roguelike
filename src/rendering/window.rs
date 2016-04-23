@@ -2,7 +2,7 @@ extern crate tcod;
 
 use self::tcod::console::{Console, Offscreen, BackgroundFlag};
 use self::tcod::Color;
-use util::{Bound};
+use util::Bound;
 
 
 macro_rules! window_component_def(
@@ -92,7 +92,7 @@ pub trait WindowComponent {
     }
 
     fn flush_buffer(&mut self) {
-        let max      = self.get_max_messages();
+        let max = self.get_max_messages();
         let messages = self.get_mut_messages();
 
         for _ in 0..max {
@@ -130,9 +130,9 @@ impl WindowComponent for TcodMessageWindowComponent {
 
 
 pub struct Windows {
-    pub stats:    Box<WindowComponent>,
-    pub map:      Box<WindowComponent>,
-    pub input:    Box<WindowComponent>,
+    pub stats: Box<WindowComponent>,
+    pub map: Box<WindowComponent>,
+    pub input: Box<WindowComponent>,
     pub messages: Box<WindowComponent>,
 }
 

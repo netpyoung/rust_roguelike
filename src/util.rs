@@ -24,7 +24,7 @@ pub enum PointEquality {
 
 impl Point {
     pub fn new(x: i32, y: i32) -> Point {
-        Point {x: x, y: y}
+        Point { x: x, y: y }
     }
 
     pub fn offset_x(&self, offset: i32) -> Point {
@@ -89,8 +89,14 @@ pub struct Bound {
 impl Bound {
     pub fn new(min_x: i32, min_y: i32, max_x: i32, max_y: i32) -> Bound {
         Bound {
-            min: Point { x: min_x, y: min_y },
-            max: Point { x: max_x, y: max_y },
+            min: Point {
+                x: min_x,
+                y: min_y,
+            },
+            max: Point {
+                x: max_x,
+                y: max_y,
+            },
         }
     }
 

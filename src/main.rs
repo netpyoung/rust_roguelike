@@ -2,9 +2,9 @@ extern crate dwemthys;
 extern crate tcod;
 
 use dwemthys::game::Game;
-use dwemthys::rendering::render::{RenderingComponentAble};
+use dwemthys::rendering::render::RenderingComponentAble;
 use dwemthys::rendering::window::WindowComponent;
-use dwemthys::movement::{MovementComponent};
+use dwemthys::movement::MovementComponent;
 use dwemthys::input::{Key, KeyCode};
 
 

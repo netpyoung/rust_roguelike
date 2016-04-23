@@ -4,13 +4,11 @@ extern crate tcod;
 use self::tcod::console::{Root, Console, BackgroundFlag, FontLayout, FontType};
 use input::{TcodInputKey, InputComponent, TcodInputComponent, KeyboardInput};
 use util::{Point, Bound};
-use rendering::window::{
-    WindowComponent,
-};
+use rendering::window::WindowComponent;
 
 pub struct TcodRenderingComponent {
     pub root: Root,
-    pub input_component: Box<InputComponent<TcodInputKey>>
+    pub input_component: Box<InputComponent<TcodInputKey>>,
 }
 
 pub trait RenderingComponentAble {
@@ -25,17 +23,17 @@ pub trait RenderingComponentAble {
 
 
 impl TcodRenderingComponent {
-    pub fn new(bound: Bound) ->  Self {
+    pub fn new(bound: Bound) -> Self {
         let w = bound.max.x + 1;
         let h = bound.max.y + 1;
         let root = Root::initializer()
-            .font("arial10x10.png", FontLayout::Tcod)
-            .font_type(FontType::Greyscale)
-            .size(w, h)
-            .title("Rust/libtcod tutorial")
-            .init();
-        let ic  = Box::new(TcodInputComponent::new());
-        TcodRenderingComponent{
+                       .font("arial10x10.png", FontLayout::Tcod)
+                       .font_type(FontType::Greyscale)
+                       .size(w, h)
+                       .title("Rust/libtcod tutorial")
+                       .init();
+        let ic = Box::new(TcodInputComponent::new());
+        TcodRenderingComponent {
             root: root,
             input_component: ic,
         }
@@ -43,7 +41,6 @@ impl TcodRenderingComponent {
 }
 
 impl RenderingComponentAble for TcodRenderingComponent {
-
     fn before_render_new_frame(&mut self) {
         self.root.clear();
     }
@@ -76,7 +73,13 @@ impl RenderingComponentAble for TcodRenderingComponent {
         {
             let console = window.get_console();
 
-            tcod::console::blit(&console, (0, 0), ((bound.max.x + 1), (bound.max.y + 1)), &mut self.root, (bound.min.x, bound.min.y), 1.0, 1.0);
+            tcod::console::blit(&console,
+                                (0, 0),
+                                ((bound.max.x + 1), (bound.max.y + 1)),
+                                &mut self.root,
+                                (bound.min.x, bound.min.y),
+                                1.0,
+                                1.0);
         }
     }
 }

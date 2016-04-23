@@ -15,20 +15,20 @@ pub enum KeyCode {
     Escape,
 
     // Default
-    None
+    None,
 }
 
 
 #[derive(Debug, Copy, Clone)]
 pub enum Key {
     Printable(char),
-    SpecialKey(KeyCode)
+    SpecialKey(KeyCode),
 }
 
 
 #[derive(Debug, Copy, Clone)]
 pub struct KeyboardInput {
-    pub key: Key
+    pub key: Key,
 }
 
 
@@ -45,26 +45,25 @@ impl TcodInputComponent {
 }
 
 impl InputComponent<TcodInputKey> for TcodInputComponent {
-
     fn translate_input(&self, key_state: TcodInputKey) -> KeyboardInput {
-        let key : Key = if key_state.shift {
+        let key: Key = if key_state.shift {
             match key_state.code {
                 self::tcod::input::KeyCode::Number5 => Key::Printable('%'),
                 self::tcod::input::KeyCode::Number6 => Key::Printable('^'),
                 self::tcod::input::KeyCode::Number7 => Key::Printable('&'),
                 self::tcod::input::KeyCode::Number8 => Key::Printable('*'),
-                _                                   => Key::SpecialKey(KeyCode::None)
+                _ => Key::SpecialKey(KeyCode::None),
             }
         } else {
             match key_state.code {
-                self::tcod::input::KeyCode::Char   => Key::Printable(key_state.printable),
-                self::tcod::input::KeyCode::Up     => Key::SpecialKey(KeyCode::Up),
-                self::tcod::input::KeyCode::Down   => Key::SpecialKey(KeyCode::Down),
-                self::tcod::input::KeyCode::Left   => Key::SpecialKey(KeyCode::Left),
-                self::tcod::input::KeyCode::Right  => Key::SpecialKey(KeyCode::Right),
-                self::tcod::input::KeyCode::Shift  => Key::SpecialKey(KeyCode::Shift),
+                self::tcod::input::KeyCode::Char => Key::Printable(key_state.printable),
+                self::tcod::input::KeyCode::Up => Key::SpecialKey(KeyCode::Up),
+                self::tcod::input::KeyCode::Down => Key::SpecialKey(KeyCode::Down),
+                self::tcod::input::KeyCode::Left => Key::SpecialKey(KeyCode::Left),
+                self::tcod::input::KeyCode::Right => Key::SpecialKey(KeyCode::Right),
+                self::tcod::input::KeyCode::Shift => Key::SpecialKey(KeyCode::Shift),
                 self::tcod::input::KeyCode::Escape => Key::SpecialKey(KeyCode::Escape),
-                _                                  => Key::SpecialKey(KeyCode::None)
+                _ => Key::SpecialKey(KeyCode::None),
             }
         };
         KeyboardInput { key: key }

@@ -27,24 +27,31 @@ impl MovementComponent for MovementComponentRandom {
     }
 
     fn update(&self, point: Point) -> Point {
-        let mut offset = Point{x:point.x, y: point.y};
+        let mut offset = Point {
+            x: point.x,
+            y: point.y,
+        };
 
-        let offset_x =rand::thread_rng().gen_range(0, 3) - 1;
+        let offset_x = rand::thread_rng().gen_range(0, 3) - 1;
         match self.move_info.borrow().bounds.contains(offset.offset_x(offset_x)) {
-            Contains::DoesNotContain => {return point;},
-            Contains::DoesContain => offset = offset.offset_x(offset_x)
+            Contains::DoesNotContain => {
+                return point;
+            }
+            Contains::DoesContain => offset = offset.offset_x(offset_x),
         }
 
-        let offset_y =rand::thread_rng().gen_range(0, 3) - 1;
+        let offset_y = rand::thread_rng().gen_range(0, 3) - 1;
         match self.move_info.borrow().bounds.contains(offset.offset_y(offset_y)) {
-            Contains::DoesNotContain => {return point;},
-            Contains::DoesContain => offset = offset.offset_y(offset_y)
+            Contains::DoesNotContain => {
+                return point;
+            }
+            Contains::DoesContain => offset = offset.offset_y(offset_y),
         }
         offset
     }
 
     fn box_clone(&self) -> Box<MovementComponent> {
-        Box::new(MovementComponentRandom{move_info: self.move_info.clone()})
+        Box::new(MovementComponentRandom { move_info: self.move_info.clone() })
     }
 }
 
@@ -60,7 +67,10 @@ impl MovementComponent for MovementComponentUser {
     fn update(&self, point: Point) -> Point {
         let keypress = self.move_info.borrow().last_keypress;
         let keyboard_input = keypress.unwrap();
-        let mut offset = Point { x: point.x, y: point.y };
+        let mut offset = Point {
+            x: point.x,
+            y: point.y,
+        };
 
         offset = match keyboard_input.key {
             Key::SpecialKey(special) => {
@@ -69,25 +79,25 @@ impl MovementComponent for MovementComponentUser {
                     KeyCode::Down => offset.offset_y(1),
                     KeyCode::Left => offset.offset_x(-1),
                     KeyCode::Right => offset.offset_x(1),
-                    _ => offset
+                    _ => offset,
                 }
-            },
-            _ => offset
+            }
+            _ => offset,
         };
 
         match self.move_info.borrow().bounds.contains(offset) {
             Contains::DoesContain => offset,
-            Contains::DoesNotContain => point
+            Contains::DoesNotContain => point,
         }
     }
 
     fn box_clone(&self) -> Box<MovementComponent> {
-        Box::new(MovementComponentUser{move_info: self.move_info.clone()})
+        Box::new(MovementComponentUser { move_info: self.move_info.clone() })
     }
 }
 
 pub struct MovementComponentAggro {
-    move_info: Rc<RefCell<MoveInfo>>
+    move_info: Rc<RefCell<MoveInfo>>,
 }
 
 impl MovementComponent for MovementComponentAggro {
@@ -98,7 +108,7 @@ impl MovementComponent for MovementComponentAggro {
     fn update(&self, point: Point) -> Point {
         let char_point = self.move_info.borrow().char_location;
 
-        let mut offset = Point{x: 0, y: 0};
+        let mut offset = Point { x: 0, y: 0 };
         match point.compare_x(char_point) {
             PointRelationX::RightOfPoint => offset = offset.offset_x(-1),
             PointRelationX::LeftOfPoint => offset = offset.offset_x(1),
@@ -110,17 +120,19 @@ impl MovementComponent for MovementComponentAggro {
             PointRelationY::OnPointY => {}
         }
         match point.offset(offset).compare(char_point) {
-            PointEquality::Equal => {return point; },
+            PointEquality::Equal => {
+                return point;
+            }
             PointEquality::NotEqual => {
                 match self.move_info.borrow().bounds.contains(point.offset(offset)) {
                     Contains::DoesContain => point.offset(offset),
-                    Contains::DoesNotContain => point
+                    Contains::DoesNotContain => point,
                 }
             }
         }
     }
 
     fn box_clone(&self) -> Box<MovementComponent> {
-        Box::new(MovementComponentAggro{move_info: self.move_info.clone()})
+        Box::new(MovementComponentAggro { move_info: self.move_info.clone() })
     }
 }
