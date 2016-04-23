@@ -1,17 +1,20 @@
 extern crate tcod;
 
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use input::{Key, KeyCode};
 
 use rendering::render::RenderingComponentAble;
 use rendering::window::Windows;
 use rendering::window::WindowComponent;
-use game::Game;
+use game::MoveInfo;
 use map::Maps;
 
 pub trait GameState {
     fn new() -> Self where Self: Sized;
 
-    fn update(&mut self, windows: &mut Windows, maps: &mut Maps);
+    fn update(&mut self, windows: &mut Windows, maps: &mut Maps, move_info: &mut Rc<RefCell<MoveInfo>>);
     fn render(&mut self, renderer: &mut RenderingComponentAble, windows: &mut Windows, maps: &mut Maps) {
         renderer.before_render_new_frame();
         for window in windows.all_windows() {
@@ -33,8 +36,9 @@ impl GameState for MovementGameState {
         MovementGameState
     }
 
-    fn update(&mut self, windows: &mut Windows, maps: &mut Maps) {
-        match Game::get_last_keypress() {
+    fn update(&mut self, windows: &mut Windows, maps: &mut Maps, move_info: &mut Rc<RefCell<MoveInfo>>) {
+        let keypress = move_info.borrow().last_keypress;
+        match keypress {
             Some(ks) => {
                 match ks.key {
                     Key::SpecialKey(KeyCode::Shift) => {
@@ -87,9 +91,10 @@ impl GameState for AttackInputGameState {
     fn exit(&self) {
     }
 
-    fn update(&mut self,  windows: &mut Windows, _: &mut Maps) {
+    fn update(&mut self,  windows: &mut Windows, _: &mut Maps, move_info: &mut Rc<RefCell<MoveInfo>>) {
+        let keypress = move_info.borrow().last_keypress;
 
-        match Game::get_last_keypress() {
+        match keypress {
             Some(keyboard_input) => {
                 let mut msg = "You attack ".to_string();
 

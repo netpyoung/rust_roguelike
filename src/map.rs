@@ -1,13 +1,18 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
+
 use util::Bound;
 use util::Point;
 use actor::Actor;
 use rendering::window::Windows;
 use rendering::render::RenderingComponentAble;
-use game::Game;
+use game::MoveInfo;
 
 pub struct Map {
     pub content: Vec<Vec<Vec<Box<Actor>>>>,
-    pub size:    Bound,
+    pub size: Bound,
+    pub move_info: Rc<RefCell<MoveInfo>>,
 }
 
 pub struct Maps {
@@ -18,11 +23,14 @@ pub struct Maps {
 }
 
 impl Map {
-    pub fn new(size: Bound) -> Map {
+
+    pub fn new(move_info: Rc<RefCell<MoveInfo>>) -> Map {
+        let size = move_info.borrow().bounds;
         let content = Map::init_contents(size);
         Map {
             content: content,
-            size:    size
+            size:size,
+            move_info: move_info,
         }
     }
 
@@ -50,7 +58,7 @@ impl Map {
                 for actor in y_iter.iter_mut() {
                     actor.update(windows);
                     if actor.is_pc {
-                        Game::set_character_point(actor.position);
+                        self.move_info.borrow_mut().char_location = actor.position;
                     }
                     let point = actor.position;
                     let new_actor = actor.clone();
@@ -74,11 +82,11 @@ impl Map {
 }
 
 impl Maps {
-    pub fn new(size: Bound) -> Maps {
-        let terrain = Box::new(Map::new(size));
-        let enemies = Box::new(Map::new(size));
-        let friends = Box::new(Map::new(size));
-        let pcs     = Box::new(Map::new(size));
+    pub fn new(move_info: Rc<RefCell<MoveInfo>>) -> Maps {
+        let terrain = Box::new(Map::new(move_info.clone()));
+        let enemies = Box::new(Map::new(move_info.clone()));
+        let friends = Box::new(Map::new(move_info.clone()));
+        let pcs     = Box::new(Map::new(move_info.clone()));
 
         Maps {
             friends: friends,

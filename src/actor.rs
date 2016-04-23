@@ -1,10 +1,13 @@
 extern crate rand;
 extern crate tcod;
 
-use util::{Point, Bound};
+use std::rc::Rc;
+use std::cell::RefCell;
+
+use util::{Point};
 use rendering::render::{RenderingComponentAble};
 use rendering::window::Windows;
-use game::Game;
+use game::MoveInfo;
 use movement::MovementComponent;
 use movement::MovementComponentRandom;
 use movement::MovementComponentUser;
@@ -28,24 +31,24 @@ impl Actor {
         }
     }
 
-    pub fn dog(x: i32, y: i32, bound: Bound) -> Actor {
-        let mc: Box<MovementComponentRandom> = Box::new(MovementComponent::new(bound));
+    pub fn dog(x: i32, y: i32, move_info: Rc<RefCell<MoveInfo>>) -> Actor {
+        let mc = Box::new(MovementComponentRandom::new(move_info));
         Actor::new(x, y, 'd', mc, false)
     }
 
-    pub fn cat(x: i32, y: i32, bound: Bound) -> Actor {
-        let mc: Box<MovementComponentRandom> = Box::new(MovementComponent::new(bound));
+    pub fn cat(x: i32, y: i32, move_info: Rc<RefCell<MoveInfo>>) -> Actor {
+        let mc = Box::new(MovementComponentRandom::new(move_info));
         Actor::new(x, y, 'c', mc, false)
     }
 
-    pub fn kobold(x: i32, y: i32, bound: Bound) -> Actor {
-        let mc: Box<MovementComponentAggro> = Box::new(MovementComponent::new(bound));
+    pub fn kobold(x: i32, y: i32, move_info: Rc<RefCell<MoveInfo>>) -> Actor {
+        let mc = Box::new(MovementComponentAggro::new(move_info));
         Actor::new(x, y, 'k', mc, false)
     }
 
-    pub fn heroine(bound: Bound) -> Actor {
-        let mc: Box<MovementComponentUser> = Box::new(MovementComponent::new(bound));
-        let p = Game::get_character_point();
+    pub fn heroine(move_info: Rc<RefCell<MoveInfo>>) -> Actor {
+        let p = move_info.borrow().char_location;
+        let mc = Box::new(MovementComponentUser::new(move_info));
         Actor::new(p.x, p.y, '@', mc, true)
     }
 

@@ -1,5 +1,8 @@
 extern crate tcod;
 
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use input::{Key, KeyboardInput};
 use util::{Bound, Point};
 use game_state::GameState;
@@ -20,10 +23,8 @@ use rendering::window::{
     TcodMessageWindowComponent,
 };
 use map::{Maps};
+use actor::{Actor};
 
-
-static mut LAST_KEYPRESS: Option<KeyboardInput> = None;
-static mut CHAR_LOCATION: Point = Point{x: 40, y: 25};
 
 pub struct Game <'a> {
     pub is_exit: bool,
@@ -32,6 +33,7 @@ pub struct Game <'a> {
     pub windows: Windows,
     pub game_state: Box<GameState>,
     pub maps: Maps,
+    move_info: Rc<RefCell<MoveInfo>>,
 }
 
 impl<'a> Game <'a> {
@@ -55,7 +57,14 @@ impl<'a> Game <'a> {
         };
 
         let gs: Box<GameState>  = Box::new(MovementGameState::new());
-        let maps = Maps::new(map_bound);
+
+        let move_info = Rc::new(RefCell::new(MoveInfo::new(map_bound)));
+        let mut maps = Maps::new(move_info.clone());
+
+        maps.pcs.push_actor(move_info.borrow().char_location, Box::new(Actor::heroine(move_info.clone())));
+        maps.friends.push_actor(Point::new(10, 10), Box::new(Actor::cat(40, 25, move_info.clone())));
+        maps.friends.push_actor(Point::new(10, 10), Box::new(Actor::dog(10, 10, move_info.clone())));
+        maps.enemies.push_actor(Point::new(10, 10), Box::new(Actor::kobold(20, 20, move_info.clone())));
 
         return Game {
             is_exit: false,
@@ -64,6 +73,7 @@ impl<'a> Game <'a> {
             windows: windows,
             game_state: gs,
             maps: maps,
+            move_info: move_info,
         }
     }
 
@@ -78,37 +88,21 @@ impl<'a> Game <'a> {
             self.game_state.enter(&mut self.windows);
         }
 
-        self.game_state.update(&mut self.windows, &mut self.maps);
+        self.game_state.update(&mut self.windows, &mut self.maps, &mut self.move_info);
     }
 
     pub fn wait_for_keypress(&mut self) -> KeyboardInput {
-        let key = self.renderer.wait_for_keypress();
-        Game::set_last_keypress(key);
-        key
+        let keyboard_input = self.renderer.wait_for_keypress();
+        self.move_info.borrow_mut().last_keypress = Some(keyboard_input);
+        keyboard_input
     }
 
     pub fn is_renderable(&mut self) -> bool {
         self.renderer.is_renderable()
     }
 
-    pub fn get_last_keypress() -> Option<KeyboardInput> {
-        unsafe { LAST_KEYPRESS }
-    }
-
-    pub fn set_last_keypress(keyboard_input: KeyboardInput) {
-        unsafe { LAST_KEYPRESS = Some(keyboard_input); }
-    }
-
-    pub fn get_character_point() -> Point {
-        unsafe { CHAR_LOCATION }
-    }
-
-    pub fn set_character_point(p: Point) {
-        unsafe { CHAR_LOCATION = p }
-    }
-
     fn update_state(&mut self) {
-        let keyboard_input = Game::get_last_keypress().unwrap();
+        let keyboard_input = self.move_info.borrow().last_keypress.unwrap();
         match keyboard_input.key {
 
             Key::Printable('/') => {
@@ -135,6 +129,22 @@ impl<'a> Game <'a> {
                 let ms : Box<MovementGameState> = Box::new(GameState::new());
                 self.game_state = ms as Box<GameState>;
             }
+        }
+    }
+}
+
+pub struct MoveInfo {
+    pub last_keypress: Option<KeyboardInput>,
+    pub char_location: Point,
+    pub bounds: Bound
+}
+
+impl MoveInfo {
+    pub fn new(bound: Bound) -> MoveInfo {
+        MoveInfo {
+            last_keypress: None,
+            char_location: Point::new(40, 25),
+            bounds: bound
         }
     }
 }
